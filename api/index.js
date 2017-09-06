@@ -12,6 +12,8 @@ app.all('*', function (req, res, next) {
   res.header('X-Powered-By', ' 3.2.1')
   next()
 })
+
+var gets = new Date();
 // 获取本机ip地址
 function getIp () {
   var os = require('os'),
@@ -38,10 +40,12 @@ app.use(bodyParser.urlencoded({ 'limit': '10000kb' }))
 app.post('/', function (req, res) {})
 // 文章接口
 app.post('/set_note', function (req, res) {
-  var data = req.body
-  sql.query('insert into blog set ?', {id: data.id,name: data.title,type: data.tag,text: data.html,md: data.md}, function (err) {
+  var data = req.body;
+  var time = gets.getTime();
+  var ymd = getDate(time);
+  sql.query('insert into blog set ?', {id: data.id,name: data.title,type: data.tag,text: data.html,md: data.md,time:ymd}, function (err) {
     if (err) {
-      console.log(err)
+      console.log(err);
       res.send({code: 0})
     }else {
       console.log('新建blog成功:  ' + data.title)
@@ -69,7 +73,9 @@ app.post('/get_note', function (req, res) {
   })
 })
 app.post('/update_note', function (req, res) {
-  sql.query('update blog set id = ?,name= ?,type=?,text=?,md=? where id=?and name=?', [req.body.id, req.body.title, req.body.tag, req.body.html, req.body.md, req.body.id, req.body.title], function (err, result) {
+    var time = gets.getTime();
+    var ymd = getDate(time);
+  sql.query('update blog set id = ?,name= ?,type=?,text=?,md=?,time=? where id=?and name=?and time?', [req.body.id, req.body.title, req.body.tag, req.body.html, req.body.md,ymd, req.body.id, req.body.title,ymd], function (err, result) {
     !err ? res.send({code: 1}) : res.send({code: 0})
   })
 })
@@ -312,3 +318,92 @@ var server = app.listen(3000, function () {
   var port = server.address().port
   console.log('应用实例，访问地址为 http://localhost:', port)
 })
+
+/**
+ * 获取星期
+ *
+ * @param {String} dateStr 时间毫秒数
+ * @returns 格式化后的时间
+ */
+function getWeek(dateStr) {
+    if (!dateStr) return ''
+    return formatDate(dateStr, 'EE')
+}
+
+/**
+ * 获取年月日
+ *
+ * @param {String} dateStr 时间毫秒数
+ * @returns 格式化后的时间
+ */
+function getYearMonthDay(dateStr) {
+    if (!dateStr) return ''
+    return formatDate(dateStr, 'yyyy-MM-dd')
+}
+
+/**
+ * 获取年月日 时分秒
+ *
+ * @param {String} dateStr 时间毫秒数
+ * @returns 格式化后的时间
+ */
+function getDate(dateStr) {
+    if (!dateStr) return ''
+    return formatDate(dateStr, 'yyyy-MM-dd HH:mm:ss')
+}
+
+
+/**
+ * 格式化时间
+ *
+ * @param {String} dateStr 时间毫秒数
+ * @returns 格式化后的时间
+ */
+function formatDate(dateStr, format) {
+    if (!dateStr) return ''
+    var date = new Date(parseInt(dateStr))
+    return date.pattern(format)
+}
+
+
+/** * 对Date的扩展，将 Date 转化为指定格式的String * 月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q)
+ 可以用 1-2 个占位符 * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) * eg: * (new
+ Date()).pattern("yyyy-MM-dd hh:mm:ss.S")==> 2006-07-02 08:09:04.423
+ * (new Date()).pattern("yyyy-MM-dd E HH:mm:ss") ==> 2009-03-10 二 20:09:04
+ * (new Date()).pattern("yyyy-MM-dd EE hh:mm:ss") ==> 2009-03-10 周二 08:09:04
+ * (new Date()).pattern("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04
+ * (new Date()).pattern("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18
+ */
+Date.prototype.pattern = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours() % 12 == 0 ? 12 : this.getHours() % 12, //小时
+        "H+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    var week = {
+        "0": "\u65e5",
+        "1": "\u4e00",
+        "2": "\u4e8c",
+        "3": "\u4e09",
+        "4": "\u56db",
+        "5": "\u4e94",
+        "6": "\u516d"
+    };
+    if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    }
+    if (/(E+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "\u661f\u671f" : "\u5468") : "") + week[this.getDay() + ""]);
+    }
+    for (var k in o) {
+        if (new RegExp("(" + k + ")").test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        }
+    }
+    return fmt;
+}
