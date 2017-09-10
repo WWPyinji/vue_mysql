@@ -12,24 +12,27 @@
 		<br/>
   </div>
 </template>
-<script >
+<script>
+    var env=require('../config/env');
 	module.exports={
           data:function(){
           	  return{
                     imgs:[],
-					urlList:[]
+					urlList:[],
+                  baseUrl : env.default.baseUrl
           	  }
           },
           props:{},
           methods:{
 		 	  add_img(event){
+		 	      var _this = this;
 		 	  	var reader =new FileReader();
 		 	  	var img1=event.target.files[0];
                 reader.readAsDataURL(img1);
                 var that=this;
                 reader.onloadend=function(){
                    	that.imgs.push(reader.result)  
-					that.$ajax.post('http://127.0.0.1:3000/send_img',that.$qs.stringify({img:reader.result})
+					that.$ajax.post(_this.baseUrl + '/send_img',that.$qs.stringify({img:reader.result})
 						
 					).then(res=>{
 						that.urlList.push(res.data.data)

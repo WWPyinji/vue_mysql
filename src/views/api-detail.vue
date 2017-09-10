@@ -13,18 +13,21 @@
   </div>
 </template>
 <script>
+//    import { env } from '../config/env';
+    var env=require('../config/env');
 	module.exports={
           data:function(){
           	  return{
                     imgs:[],
 					urlList:[],
-					ip:''
+					ip:'',
+                    baseUrl : env.default.baseUrl
           	  }
           },
           props:{},
           created(){
 			var that = this;
-			this.$ajax.post('http://127.0.0.1:3000/get_address').then(res=>{
+			this.$ajax.post(this.baseUrl + '/get_address').then(res=>{
 						that.ip = res.data;
 					})   
 		  }

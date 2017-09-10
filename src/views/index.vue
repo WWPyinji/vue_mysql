@@ -9,7 +9,7 @@
                     <i class="el-icon-caret-top el-icon--right" v-if='meauShow'></i>
             </el-button>
             <ul class='meau' v-show='meauShow'>
-                <li>修改资料</l>
+                <li>修改资料</li>
                 <li @click='quit()'>退出</li>
             </ul>
           </el-col>

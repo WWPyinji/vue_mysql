@@ -24,6 +24,7 @@
    </div>
 </template>
 <script>
+    import env from '../config/env'
     export default{
         data(){
             return {
@@ -37,12 +38,12 @@
         },
         methods:{
             readyDelete(name){
-                this.dialogVisible = true
+                this.dialogVisible = true;
                 this.nowName = name;
             },
             getLm(){
                 var that = this;
-                this.$ajax.post('http://127.0.0.1:3000/get_leaveword', this.$qs.stringify({
+                this.$ajax.post(env.baseUrl + '/get_leaveword', this.$qs.stringify({
                     id: sessionStorage.getItem('name'),
                 })).then(res => {
                     that.data = res.data.data;
@@ -50,7 +51,7 @@
             },
             deleteLm(name){
                 var that = this;
-                this.$ajax.post('http://127.0.0.1:3000/delete_leaveword', this.$qs.stringify({
+                this.$ajax.post(env.baseUrl + '/delete_leaveword', this.$qs.stringify({
                     id: sessionStorage.getItem('name'),
                     name: that.nowName
                 })).then(res => {

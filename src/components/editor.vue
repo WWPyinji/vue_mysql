@@ -18,6 +18,7 @@
 </template>
 
 <script>
+    import env from '../config/env'
     import { markdownEditor } from 'vue-simplemde';         // 导入markdownEditor组件
     import uploadImg from './upload-img.vue'
     export default {
@@ -46,7 +47,7 @@
         mounted(){
             var that = this;
             this.$help.$on("get_md",function(req){
-                this.$ajax.post('http://127.0.0.1:3000/get_md_blog', this.$qs.stringify({
+                this.$ajax.post(env.baseUrl + '/get_md_blog', this.$qs.stringify({
                     id: sessionStorage.getItem('name'),
                     name:req.name
                 })).then(res =>{
@@ -110,7 +111,7 @@
                     })
                     return;
                 }
-                    this.$ajax.post('http://127.0.0.1:3000/'+url+'',this.$qs.stringify({
+                    this.$ajax.post(env.baseUrl + '/'+url+'',this.$qs.stringify({
                         id:sessionStorage.getItem('name'),
                         title : that.title,
                         html : that.getHtml(),

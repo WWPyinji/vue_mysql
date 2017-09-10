@@ -24,6 +24,7 @@
 
 <script>
 import statistics from './../components/statistics.vue'
+import env from '../config/env'
 export default {
   name: 'home',
   data() {
@@ -36,7 +37,7 @@ export default {
   },
   mounted() {
     var that =this;
-   this.$ajax.post('http://127.0.0.1:3000/get_msg', this.$qs.stringify({
+   this.$ajax.post(env.baseUrl + '/get_msg', this.$qs.stringify({
       id: sessionStorage.getItem('name'),
     })).then(res => {
       that.data = res.data;

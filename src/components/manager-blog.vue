@@ -25,6 +25,7 @@
         </div>
 </template>
 <script>
+    import env from '../config/env'
     export default {
     data() {
       return {
@@ -44,7 +45,7 @@
     methods: {
         getList(){
             var that = this;
-            this.$ajax.post('http://127.0.0.1:3000/get_note', this.$qs.stringify({
+            this.$ajax.post(env.baseUrl + '/get_note', this.$qs.stringify({
                 id :  sessionStorage.getItem('name')
             })).then(res=>{
                     var  res = that.$qs.parse(res).data;
@@ -66,7 +67,7 @@
         deleteTitle(){
             var that = this;
             this.dialogVisible = false;
-            this.$ajax.post('http://127.0.0.1:3000/delete_note',this.$qs.stringify({
+            this.$ajax.post(env.baseUrl + '/delete_note',this.$qs.stringify({
                     name:that.nowName,
                     id: sessionStorage.getItem('name')
                 })).then(res=>{

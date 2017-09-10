@@ -11,6 +11,7 @@
   </div>  
 </template>
 <script>
+    import env from '../config/env'
    export default{
       data(){
         return {
@@ -26,7 +27,7 @@
               if(that.password != that.re_password){
                 that.$message.error("密码校验不正确！")
               }else{
-                this.$ajax.post('http://127.0.0.1:3000/register',this.$qs.stringify({
+                this.$ajax.post(env.baseUrl + '/register',this.$qs.stringify({
                     username : that.username,
                     password : that.password,
                 })).then(res=>{
